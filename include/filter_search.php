@@ -55,12 +55,12 @@ require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.
 
         if ($_GET["min_width"] && $_GET["min_width"] != 'NaN' && $_GET["min_width"] != '0') {
             $min_width = (int) $_GET["min_width"];
-            $result_sql = $result_sql . " AND length = {$min_width}";
+            $result_sql = $result_sql . " AND width >= {$min_width}";
         }
 
         if ($_GET["min_length"] && $_GET["min_length"] != 'NaN' && $_GET["min_length"] != '0') {
             $min_length = (int) $_GET["min_length"];
-            $result_sql = $result_sql . " AND width = {$min_length}";
+            $result_sql = $result_sql . " AND length >= {$min_length}";
         }
 
         //echo $result_sql;

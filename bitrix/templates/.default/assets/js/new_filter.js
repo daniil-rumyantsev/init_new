@@ -1,5 +1,7 @@
 'use strict';
 
+var initialUrl = getClearURL(window.location.href);
+
 var resultData = {
     category_check: '',
     series_check: '',
@@ -17,30 +19,41 @@ var resultData = {
     inputID: ''
 };
 $(document).ready(function () {
+	
+	var cat = getParameterByName("category");
+	var ser = getParameterByName("series");
+	var floor = getParameterByName("house-floors");
+	var tech = getParameterByName("house-tech");
+	var max_area = getParameterByName("max-area");
+	var min_area = getParameterByName("min-area");
+	var max_price = getParameterByName("max-price");
+	var min_price = getParameterByName("min-price");
+	var min_width = getParameterByName("min-width");
+	var min_length = getParameterByName("min-length");
+	
+	
+
+	resultData.category_check = cat;
+	resultData.series_check = ser;
+	resultData.floor_check = floor;
+	resultData.tech_check = tech;
+	if (max_area) resultData.max_area = max_area;
+	if (min_area) resultData.min_area = min_area;
+	if (max_price) resultData.max_price = max_price;
+	if (min_price) resultData.min_price = min_price;
+	if (min_width) resultData.min_width = min_width;
+	if (min_length) resultData.min_length = min_length;
+	
+	//resultData!!!!
+	//console.log(resultData);
+	
+	if (cat||ser||floor||tech||max_area||min_area||max_price||min_price||min_width||min_length) filter();
     //document.referrer
     //alert(window.location.href);
     //alert(document.referrer);
-
+    
+	//alert(window.location);
     $('.price-link-page').on('click',function(){
-
-        deleteCookie('VARIANT_HOUSE');
-
-        var type = $(this).data('tech');
-
-
-        switch (type) {
-            case 'Каркас':
-                setCookie("VARIANT_HOUSE", "KARKAS");
-                break;
-            case 'Брус':
-                setCookie("VARIANT_HOUSE", "BRUS");
-                break;
-            case 'Кирпич':
-                setCookie("VARIANT_HOUSE", "KIRPICH");
-                break;
-            default:
-                setCookie("VARIANT_HOUSE", "KARKAS");
-        }
 
         return true;
 
@@ -48,8 +61,6 @@ $(document).ready(function () {
 
 
     var hintState = false;
-
-    readCookie();
 
     $('.house__filter').on('click', '.dropdown', function (e) {
         var targetBtn = $(this).children('.my-btn-filter');
@@ -60,19 +71,7 @@ $(document).ready(function () {
     });
 
     $('#filter_refresh').on('click', function () {
-        deleteCookie("categories");
-        deleteCookie("tech_check");
-        deleteCookie("realmodel");
-        deleteCookie("series_check");
-        deleteCookie("floor_check");
-        deleteCookie("min_price");
-        deleteCookie("min_width");
-        deleteCookie("min_length");
-        deleteCookie("max_price");
-        deleteCookie("max_area");
-        deleteCookie("min_area");
-        deleteCookie('VARIANT_HOUSE');
-        location.reload();
+        window.location = initialUrl;
         return false;
     });
 
@@ -91,27 +90,21 @@ $(document).ready(function () {
         if (class_cross == 'categoryDropdown') {
             $('#category').val('');
             resultData.category_check = '';
-            deleteCookie("categories");
             filter();
         }
         if (class_cross == 'seriesDropdown') {
             $('#modalinpt').val('');
             resultData.series_check = '';
-            deleteCookie("realmodel");
-            deleteCookie("series_check");
             filter();
         }
         if (class_cross == 'house-floorsDropdown') {
             $('#floors').val('');
             resultData.floor_check = '';
-            deleteCookie("floor_check");
             filter();
         }
         if (class_cross == 'house-techDropdown') {
             $('#tech').val('');
             resultData.tech_check = '';
-            deleteCookie("tech_check");
-            deleteCookie("VARIANT_HOUSE");
             filter();
         }
         if (class_cross == 'house-priceDropdown') {
@@ -119,8 +112,6 @@ $(document).ready(function () {
             $('#house-price-up-to').val('');
             resultData.min_price = 0;
             resultData.max_price = 0;
-            deleteCookie("min_price");
-            deleteCookie("max_price");
             rangePrice.textFrom = '';
             rangePrice.textTo = '';
             filter();
@@ -130,8 +121,6 @@ $(document).ready(function () {
             $('#house-length-from').val('');
             resultData.min_width = 0;
             resultData.min_length = 0;
-            deleteCookie("min_width");
-            deleteCookie("min_length");
             rangeSize.textFrom = '';
             rangeSize.textTo = '';
             filter();
@@ -141,8 +130,6 @@ $(document).ready(function () {
             $('#house-area-up-to').val('');
             resultData.min_area = 0;
             resultData.max_area = 0;
-            deleteCookie("max_area");
-            deleteCookie("min_area");
             rangeArea.textFrom = '';
             rangeArea.textTo = '';
             filter();
@@ -178,16 +165,12 @@ $(document).ready(function () {
             $('#modalinpt').val(val);
             resultData.series_check = val;
             resultData.realmodel = idx;
-            setCookie("realmodel", idx);
-            setCookie("series_check", val);
         }
 
         if ($(this).hasClass('category-li-filter')) {
             var val = $(this).data('id');
             $('#category').attr('val', val);
             $('#category').val(val);
-
-            setCookie("categories", val);
             resultData.category_check = val;
         }
 
@@ -195,24 +178,12 @@ $(document).ready(function () {
             var val = $(this).data('id');
             $('#floors').val(val);
             resultData.floor_check = val;
-            setCookie("floor_check", val);
         }
 
         if (!$(this).hasClass('filter-tech-li')) {} else {
             var val = $(this).data('id');
             $('#tech').val(val);
             resultData.tech_check = val;
-            setCookie("tech_check", val); //VARIANT_HOUSE
-
-            if (val == 'Каркасный 150' || val == 'Каркасный 100' || val == 'Каркасный 200') {
-                setCookie("VARIANT_HOUSE", "KARKAS");
-            }
-            if (val == 'Брус клееный 150' || val == 'Брус клееный 180' || val == 'Брус клееный 180 МБ') {
-                setCookie("VARIANT_HOUSE", "BRUS");
-            }
-            if (val == 'Кирпичный') {
-                setCookie("VARIANT_HOUSE", "KIRPICH");
-            }
         }
 
         if (filterBtnID == 'house-floorsDropdown') {
@@ -392,12 +363,9 @@ $(document).ready(function () {
             btnprice.html(btnprice.data("placeholder") + ' <span class="my-caret"></span>');
             resultData.min_width = 0;
             resultData.min_length = 0;
-            deleteCookie("min_width");
-            deleteCookie("min_length");
         } else {
             if (isNaN(wmin)) {
                 resultData.min_width = 0;
-                deleteCookie("min_width");
             } else {
                 //console.log('22',wmin);
                 btnsize.html(textInputSize).addClass('my-btn-filter--highlighted');
@@ -405,20 +373,17 @@ $(document).ready(function () {
                 $('#' + filterBtnID + '_span').show();
                 var min_width = wmin; //parseInt($('#house-width-from').attr('data-val'))
                 resultData.min_width = min_width;
-                setCookie("min_width", min_width);
                 //console.log('3',resultData.min_width);
             }
 
             if (isNaN(lmin)) {
                 resultData.min_length = 0;
-                deleteCookie("min_length");
             } else {
                 btnsize.html(textInputSize).addClass('my-btn-filter--highlighted');
                 $('#' + filterBtnID + '_cross').show();
                 $('#' + filterBtnID + '_span').show();
                 var min_length = parseInt($('#house-length-from').attr('data-val'));
                 resultData.min_length = min_length;
-                setCookie("min_length", min_length);
             }
         }
 
@@ -430,23 +395,18 @@ $(document).ready(function () {
             btnprice.html(btnprice.data("placeholder") + ' <span class="my-caret"></span>');
             resultData.max_price = 0;
             resultData.min_price = 0;
-            deleteCookie("min_price");
-            deleteCookie("max_price");
         } else {
             if (isNaN(pmin)) {
                 resultData.min_price = 0;
-                deleteCookie("min_price");
             } else {
                 btnprice.html(textInputPrice).addClass('my-btn-filter--highlighted');
                 $('#' + filterBtnID + '_cross').show();
                 $('#' + filterBtnID + '_span').show();
                 var min_price = parseInt($('#house-price-from').attr('data-val'));
                 resultData.min_price = min_price;
-                setCookie("min_price", min_price);
             }
             if (isNaN(pmax)) {
                 resultData.max_price = 0;
-                deleteCookie("max_price");
             } else {
 
                 btnprice.html(textInputPrice).addClass('my-btn-filter--highlighted');
@@ -454,7 +414,6 @@ $(document).ready(function () {
                 $('#' + filterBtnID + '_span').show();
                 var max_price = parseInt($('#house-price-up-to').attr('data-val'));
                 resultData.max_price = max_price;
-                setCookie("min_price", max_price);
             }
         }
 
@@ -467,13 +426,10 @@ $(document).ready(function () {
             btnarea.html(btnarea.data("placeholder") + ' <span class="my-caret"></span>');
             resultData.min_area = 0;
             resultData.max_area = 0;
-            deleteCookie("max_area");
-            deleteCookie("min_area");
         } else {
 
             if (isNaN(amin)) {
                 resultData.min_area = 0;
-                deleteCookie("min_area");
             } else {
                 btnarea.html(textInputArea).addClass('my-btn-filter--highlighted');
                 $('#' + filterBtnID + '_cross').show();
@@ -482,11 +438,9 @@ $(document).ready(function () {
                 var min_area = parseInt($('#house-area-from').attr('data-val'));
 
                 resultData.min_area = min_area;
-                setCookie("min_area", min_area);
             }
             if (isNaN(amax)) {
                 resultData.max_area = 0;
-                deleteCookie("max_area");
             } else {
                 btnarea.html(textInputArea).addClass('my-btn-filter--highlighted');
                 $('#' + filterBtnID + '_cross').show();
@@ -495,7 +449,6 @@ $(document).ready(function () {
                 var max_area = parseInt($('#house-area-up-to').attr('data-val'));
 
                 resultData.max_area = max_area;
-                setCookie("max_area", max_area);
             }
         }
 
@@ -566,67 +519,9 @@ $(document).ready(function () {
     //filter();
 });
 
-function readCookie() {
-
-    var update = 0;
-
-    if (getCookie("categories")) {
-        resultData.category_check = getCookie("categories");
-        $('#categoryDropdown').addClass('my-btn-filter--highlighted').text(resultData.category_check);
-        $('#categoryDropdown_cross').css('display', 'inline');
-        update = 1;
-    }
-    if (getCookie("realmodel") && getCookie("series_check")) {
-        resultData.series_check = getCookie("series_check");
-        resultData.realmodel = getCookie("realmodel");
-        $('#seriesDropdown').addClass('my-btn-filter--highlighted').text(resultData.series_check);
-        $('#seriesDropdown_cross').css('display', 'inline');
-        update = 1;
-    }
-    if (getCookie("max_area")) {
-        resultData.max_area = getCookie("max_area");
-        update = 1;
-    }
-    if (getCookie("min_area")) {
-        resultData.max_area = getCookie("min_area");
-        update = 1;
-    }
-    if (getCookie("floor_check")) {
-        resultData.floor_check = getCookie("floor_check");
-        $('#house-floorsDropdown').addClass('my-btn-filter--highlighted').text(resultData.floor_check);
-        $('#house-floorsDropdown_cross').css('display', 'inline');
-        update = 1;
-    }
-    if (getCookie("tech_check")) {
-        resultData.tech_check = getCookie("tech_check");
-        $('#house-techDropdown').addClass('my-btn-filter--highlighted').text(resultData.tech_check);
-        $('#house-techDropdown_cross').css('display', 'inline');
-        update = 1;
-    }
-    if (getCookie("min_price")) {
-        resultData.min_price = getCookie("min_price");
-        update = 1;
-    }
-    if (getCookie("max_price")) {
-        resultData.max_price = getCookie("max_price");
-        update = 1;
-    }
-    if (getCookie("min_width")) {
-        resultData.min_width = getCookie("min_width");
-        update = 1;
-    }
-    if (getCookie("min_length")) {
-        resultData.min_length = getCookie("min_length");
-        update = 1;
-    }
-
-    if (update) {
-        filter();
-    }
-}
-
 function filter() {
-
+	
+	var url = initialUrl;
     var chosenOptionsBlock = $('.b-chosen-options');
     var refreshBtn = $('.b-reset-button');
     var variantsCount = $('#variants-count');
@@ -642,13 +537,72 @@ function filter() {
     var floors = resultData.floor_check;
     var tehnologies = resultData.tech_check;
     var validate = $('#valit').val();
+	var category_cheked = $('#category_cheked').length;
+	var needAmp = false;
+	
+	
+	
+	if (categories && !category_cheked) 
+	{
+		url += (needAmp ? '&' : '?') + 'category='+categories;
+		needAmp = true;
+	}
+	if (series) 
+	{
+		url += (needAmp ? '&' : '?') + 'series='+series;
+		needAmp = true;
+	}
+	if (floors) 
+	{
+		url += (needAmp ? '&' : '?') + 'house-floors='+floors;
+		needAmp = true;
+	}
+	if (tehnologies) 
+	{
+		url += (needAmp ? '&' : '?') + 'house-tech='+tehnologies;
+		needAmp = true;
+	}
+	if (resultData.max_area)
+	{
+		url += (needAmp ? '&' : '?') + 'max-area='+resultData.max_area;
+		needAmp = true;
+	}
+	if (resultData.min_area)
+	{
+		url += (needAmp ? '&' : '?') + 'min-area='+resultData.min_area;
+		needAmp = true;
+	}
+	if (resultData.max_price)
+	{
+		url += (needAmp ? '&' : '?') + 'max-price='+resultData.max_price;
+		needAmp = true;
+	}
+	if (resultData.min_price)
+	{
+		url += (needAmp ? '&' : '?') + 'min-price='+resultData.min_price;
+		needAmp = true;
+	}
+	if (resultData.min_width)
+	{
+		url += (needAmp ? '&' : '?') + 'min-width='+resultData.min_width;
+		needAmp = true;
+	}
+	if (resultData.min_length)
+	{
+		url += (needAmp ? '&' : '?') + 'min-length='+resultData.min_length;
+		needAmp = true;
+	}
+	
 
     //console.log(resultData.min_width,resultData.min_length);
     //console.log(resultData.postajax);
 
 
-    //console.log('post');
+    console.log(resultData);
 
+	window.history.pushState(null, null, url);
+	
+	
 
     $.ajax('/include/filter_search.php', {
         method: 'GET',
@@ -860,42 +814,36 @@ function declension(num, expressions) {
     return resultat;
 }
 
-function setCookie(name, value, options) {
-    options = options || {};
-
-    var expires = options.expires;
-
-    if (typeof expires == "number" && expires) {
-        var d = new Date();
-        d.setTime(d.getTime() + expires * 1000);
-        expires = options.expires = d;
+function getParameterByName(name) 
+{
+	
+	
+	name = name.replace(/[\[\]]/g, "\\$&");
+	
+    var url = window.location.href;
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    var results = regex.exec(url);
+    
+    
+    if(name == 'category'){
+    	var res = $('#categoryDropdown').text().trim();
+    	if(res != 'Категория дома'){
+    		return res;
+    	}
+    	
     }
-    if (expires && expires.toUTCString) {
-        options.expires = expires.toUTCString();
-    }
+    
+    
+    if (!results) return '';
+    if (!results[2]) return '';
+   
+	
 
-    value = encodeURIComponent(value);
-
-    var updatedCookie = name + "=" + value;
-
-    for (var propName in options) {
-        updatedCookie += "; " + propName;
-        var propValue = options[propName];
-        if (propValue !== true) {
-            updatedCookie += "=" + propValue;
-        }
-    }
-
-    document.cookie = updatedCookie;
+    return decodeURIComponent(results[2].replace(/\+/g, " "));;
 }
 
-function getCookie(name) {
-    var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
+function getClearURL(url)
+{
+	return url.replace(/\?(.*)/, "");
 }
 
-function deleteCookie(name) {
-    setCookie(name, "", {
-        expires: -1
-    });
-}

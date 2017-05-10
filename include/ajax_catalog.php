@@ -1,8 +1,9 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.php');
 global $APPLICATION;
-
-
+// echo '<pre>';
+// var_dump($_GET);
+// echo '</pre>';
 ?>
 <?php if (!$_GET['result_filter']): ?>
     <?php
@@ -27,7 +28,6 @@ global $APPLICATION;
 
 	<?php
 		$result_filter = $_GET['result_filter'];
-
         $arSelect = Array("ID", "NAME", "DETAIL_PAGE_URL", "PROPERTY_VARIANTS_HOUSE", "PROPERTY_FILES", "PROPERTY_SIZER", "PREVIEW_PICTURE", "PROPERTY_PODPIS");
         $arFilter = Array("IBLOCK_ID" => 13, "ACTIVE" => "Y", Array("ID" => $result_filter));
         $res = CIBlockElement::GetList(Array(), $arFilter, false, Array("nPageSize" => 150), $arSelect);
