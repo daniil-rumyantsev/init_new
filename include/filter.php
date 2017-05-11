@@ -9,79 +9,6 @@ if($ar_res = $res->GetNext()){
     $SECTION_NAME = $ar_res['NAME'];
 }
 
-function validate_get()
-{
-	if($_GET)
-	{
-		$res = false;
-		
-		if ($_GET["category"])
-		{
-			$_GET["category"] = HTMLToTxt($_GET["category"]);
-			$res = true;
-		}
-		
-		if ($_GET["series"])
-		{
-			$_GET["series"] = HTMLToTxt($_GET["series"]);
-			$res = true;
-		}
-		
-		if ($_GET["min-area"])
-		{
-			$_GET["min-area"] = intval($_GET["min-area"]);
-			$res = true;
-		}
-		
-		if ($_GET["max-area"])
-		{
-			$_GET["max-area"] = intval($_GET["max-area"]);
-			$res = true;
-		}
-		
-		if ($_GET["house-floors"])
-		{
-			$_GET["house-floors"] = intval($_GET["house-floors"]);
-			$res = true;
-		}
-		
-		if ($_GET["house-tech"])
-		{
-			$_GET["house-tech"] = intval($_GET["house-tech"]);
-			$res = true;
-		}
-		
-		if ($_GET["min-price"])
-		{
-			$_GET["min-price"] = intval($_GET["min-price"]);
-			$res = true;
-		}
-		
-		if ($_GET["max-price"])
-		{
-			$_GET["max-price"] = intval($_GET["max-price"]);
-			$res = true;
-		}
-		
-		if ($_GET["min-width"])
-		{
-			$_GET["min-width"] = intval($_GET["min-width"]);
-			$res = true;
-		}
-		
-		if ($_GET["min-length"])
-		{
-			$_GET["min-length"] = intval($_GET["min-length"]);
-			$res = true;
-		}
-		
-		return $res;
-		
-	} else {
-		return false;
-	}
-}
-
 if($_GET['resetFilter'] == 'Y'){
     SetCookie("categories","");
     SetCookie("series_check","");
@@ -96,90 +23,83 @@ if($_GET['resetFilter'] == 'Y'){
 ?>
 <?php if (CModule::IncludeModule("iblock")): ?>
     <?php
-    $result = [];
+    $result = array();
     if($SECTION_ID){
     	
         $categories = array($SECTION_ID => $SECTION_NAME);
 		$_GET["category"] = $SECTION_NAME;
     }else{
-        $categories = [];
+        $categories = array();
     }
     
-    $series = [];
-    $floors = [];
-    $tehnologies = [];
-    $areas = [];
+    $series = array();
+    $floors = array();
+    $tehnologies = array();
+    $areas = array();
     $min_area = 0;
     $max_area = 0;
-    $prices = [];
-    $widths = [];
-    $lengths = [];
+    $prices = array();
+    $widths = array();
+    $lengths = array();
     $min_price = 0;
     $max_price = 0;
     $min_width = 0;
     $max_width = 0;
     $min_length = 0;
     $max_length = 0;
-     
-    
-	//die();
 	
-    if (validate_get()){
+    if (!empty($_GET))
+    {
 
-        if($USER->isAdmin()){
-            //echo "<pre>";
-            //var_dump($series);
-            //ar_dump($_GET);
-        }
         $result_sql = "SELECT * FROM b_filter_house WHERE active = '1'";
 
         if ($_GET["category"]) {
-            $cat = mysql_escape_string($_GET["category"]);
+            $cat = mysql_escape_string(HTMLToTxt($_GET["category"]));
             $result_sql = $result_sql . " AND category_name = '{$cat}'";
         }
         if ($_GET["model"]) {
-            $ser = mysql_escape_string($_GET["model"]);
+            $ser = mysql_escape_string(HTMLToTxt($_GET["model"]));
             $result_sql = $result_sql . " AND series_name = '{$ser}'";
         }
 
         if ($_GET["house-floors"]) {
-            $floor = (int) $_GET["house-floors"];
+            $floor = (int)$_GET["house-floors"];
             $result_sql = $result_sql . " AND floors = '{$floor}'";
         }
 
         if ($_GET["house-tech"]) {
-            $tech = mysql_escape_string($_GET["house-tech"]);
+            $tech = mysql_escape_string(HTMLToTxt($_GET["house-tech"]));
             $result_sql = $result_sql . " AND technology = '{$tech}'";
         }
 
-        if ($_GET["house-areaUpto"] && $_GET["house-areaUpto"] != 'NaN' && $_GET["house-areaUpto"] != '0') {
-            $max_area = (int) $_GET["house-areaUpto"];
+        if ($_GET["max-area"] && $_GET["max-area"] != 'NaN' && $_GET["max-area"] != '0') {
+            $max_area = (int)$_GET["max-area"];
             $result_sql = $result_sql . " AND total_area <= {$max_area}";
         }
 
         if ($_GET["min-area"] && $_GET["min-area"] != 'NaN' && $_GET["min-area"] != '0') {
-            $min_area = (int) $_GET["min-area"];
+            $min_area = (int)$_GET["min-area"];
             $result_sql = $result_sql . " AND total_area >= {$min_area}";
         }
 
         if ($_GET["max-area"] && $_GET["max-area"] != 'NaN' && $_GET["max-area"] != '0') {
-            $max_price = (int) $_GET["max-area"];
+            $max_price = (int)$_GET["max-area"];
             $result_sql = $result_sql . " AND price_value <= {$max_price}";
         }
 
         if ($_GET["min-price"] && $_GET["min-price"] != 'NaN' && $_GET["min-price"] != '0') {
-            $min_price = (int) $_GET["min-price"];
+            $min_price = (int)$_GET["min-price"];
             $result_sql = $result_sql . " AND price_value >= {$min_price}";
         }
 
 		if ($_GET["max-price"] && $_GET["max-price"] != 'NaN' && $_GET["max-price"] != '0') {
-            $max_price = (int) $_GET["max-price"];
+            $max_price = (int)$_GET["max-price"];
             $result_sql = $result_sql . " AND price_value <= {$max_price}";
         }
 
 
         if ($_GET["min-length"] && $_GET["min-length"] != 'NaN' && $_GET["min-length"] != '0') {
-            $min_length = (int) $_GET["min-length"];
+            $min_length = (int)$_GET["min-length"];
             $result_sql = $result_sql . " AND length >= {$min_length}";
         }
         
@@ -189,17 +109,10 @@ if($_GET['resetFilter'] == 'Y'){
             $result_sql = $result_sql . " AND width >= {$min_width}";
         }
 
-
-	
-
-
         $result_sql = $result_sql." ORDER BY series_name";
         $resultSQL = $DB->Query($result_sql);
-		
-		
-        
-      
-        $result = [];
+
+        $result = array();
         while ($row = $resultSQL->Fetch()) {
             $result[] = $row;
         }
@@ -209,7 +122,8 @@ if($_GET['resetFilter'] == 'Y'){
        // $result = array_unique($result);
        // die();
 
-        foreach ($result as $v) {
+        foreach ($result as $v) 
+        {
             if (!in_array($v['category_name'], $categories)) {
                 $categories[$v['id_category']] = $v['category_name'];
             }
@@ -240,8 +154,6 @@ if($_GET['resetFilter'] == 'Y'){
         $min_area = min($areas);
         $max_area = max($areas);
 
-
-
         $min_price = min($prices);
         $max_price = max($prices);
 
@@ -250,15 +162,9 @@ if($_GET['resetFilter'] == 'Y'){
 
 
         $min_width = min($widths);
-        $max_width = max($widths);
-
-
-        // echo "<pre>";
-        //var_dump($categories);
+        $max_width = max($widths); 
         
-        
-        
-   
+  
     } else {
 
 //var_dump($SECTION_ID);
@@ -292,11 +198,11 @@ if($_GET['resetFilter'] == 'Y'){
             if (!in_array($v['technology'], $tehnologies)) {
                 $tehnologies[] = $v['technology'];
             }
-            if (!in_array($v['total_area'], $areas)) {
-                $areas[] = round($v['total_area']);
+            if ($v['total_area'] && !in_array($v['total_area'], $areas)) {
+                $areas[] = $v['total_area'];
             }
             if (!in_array($v['price_value'], $prices)) {
-                $prices[] = round($v['price_value']);
+                $prices[] = $v['price_value'];
             }
             if (!in_array($v['width'], $widths)) {
                 $widths[] = round($v['width']);
@@ -309,8 +215,6 @@ if($_GET['resetFilter'] == 'Y'){
         $min_area = min($areas);
         $max_area = max($areas);
 
-
-
         $min_price = round(min($prices));
         $max_price = round(max($prices));
 
@@ -320,6 +224,7 @@ if($_GET['resetFilter'] == 'Y'){
 
         $min_width = min($widths);
         $max_width = max($widths);
+		
     }
     
     
@@ -465,7 +370,7 @@ if($_GET['resetFilter'] == 'Y'){
                         <input name="house-floors" id="floors" value="<?= $_GET['house-floors'] ?>" class="hidden" type="text">
                         <span class="my-cross" id="house-floorsDropdown_cross" style="display: inline;" data-parent="house-floorsDropdown"></span>
                         <button class="btn my-btn-filter btn-lg dropdown-toggle my-btn-filter--highlighted" type="button" id="house-floorsDropdown" data-checked="false" data-placeholder="Этажность" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <?= $_GET['house-floors'] ?>
+                            <?= $_GET['house-floors'] ?> <?php echo declension_words($_GET['house-floors'], ['этаж', 'этажа', 'этажей']); ?>
                             <span class="my-caret" style="display: none;"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu--terem floors-filter" aria-labelledby="dropdownRoad">
@@ -569,15 +474,15 @@ if($_GET['resetFilter'] == 'Y'){
                 <div class="dropdown">
                     <span class="my-cross" id="house-sizeDropdown_cross" style="display: inline;" data-parent="house-sizeDropdown"></span>
                     <button class="btn my-btn-filter btn-lg dropdown-toggle my-btn-filter--highlighted" type="button" id="house-sizeDropdown" data-placeholder="Размер" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <?php if ($_GET['min-width']): ?> <?= $_GET['min-width'] ?> <?php endif; ?>
-                        <?php if ($_GET['min-length']): ?> x <?= $_GET['min-length'] ?> <?php endif; ?>
+                        <?php if ($_GET['min-length']): ?> <?= $_GET['min-length'] ?> <?php endif; ?>
+                        <?php if ($_GET['min-width']): ?> x <?= $_GET['min-width'] ?> <?php endif; ?>
                         <span class="my-caret"  style="display: none;"></span>
                     </button>
                     <div class="dropdown-menu dropdown-menu--terem" aria-labelledby="house-sizeDropdown">
                         <div class="range-box">
-                            <div class="input-wrapper"><input name="house-widthFrom" data-name="house-width" id="house-width-from" data-val="<?= $min_width ?>" value="<?= $_GET['min-width'] ?>" placeholder="длина" type="number"><span class="enter-icon"></span></div>
-                            &nbsp;-&nbsp;
                             <div class="input-wrapper"><input name="house-lengthFrom" data-name="house-length" id="house-length-from" data-val="<?= $min_length ?>" value="<?= $_GET['min-length'] ?>" placeholder="ширина" type="number"><span class="enter-icon"></span></div>
+                            &nbsp;-&nbsp;
+                            <div class="input-wrapper"><input name="house-widthFrom" data-name="house-width" id="house-width-from" data-val="<?= $min_width ?>" value="<?= $_GET['min-width'] ?>" placeholder="длина" type="number"><span class="enter-icon"></span></div>
                             м
                         </div>
                     </div>
@@ -591,9 +496,9 @@ if($_GET['resetFilter'] == 'Y'){
                     </button>
                     <div class="dropdown-menu dropdown-menu--terem" aria-labelledby="house-sizeDropdown">
                         <div class="range-box">
-                            <div class="input-wrapper"><input name="house-widthFrom" data-name="house-width" id="house-width-from" data-val="<?= $min_width ?>" value="" placeholder="до <?= $max_length ?>" type="number"><span class="enter-icon"></span></div>
+                            <div class="input-wrapper"><input name="house-lengthFrom" data-name="house-length" id="house-length-from" data-val="<?= $min_length ?>" value="" placeholder="до <?= $max_length ?>" type="number"><span class="enter-icon"></span></div>
                             &nbsp;-&nbsp;
-                            <div class="input-wrapper"><input name="house-lengthFrom" data-name="house-length" id="house-length-from" data-val="<?= $min_length ?>" value="" placeholder="до <?= $max_width ?>" type="number"><span class="enter-icon"></span></div>
+                            <div class="input-wrapper"><input name="house-widthFrom" data-name="house-width" id="house-width-from" data-val="<?= $min_width ?>" value="" placeholder="до <?= $max_width ?>" type="number"><span class="enter-icon"></span></div>
                             м.
                         </div>
                     </div>
@@ -641,9 +546,9 @@ if($_GET['resetFilter'] == 'Y'){
 
 
 
-                            <?php if($_GET['floors']):?>
+                            <?php if($_GET['house-floors']):?>
                                 <span class="chosen-option" id="house-floorsDropdown_span">
-                                    <?= $_GET['floors'] ?> эт.
+                                    <?= $_GET['house-floors'] ?> эт.
                                     <span class="my-cross my-cross--b-chosen-option house-floorDropdown" data-parent="house-floorDropdown"></span>
                                 </span>
                             <?php else:?>
@@ -673,8 +578,8 @@ if($_GET['resetFilter'] == 'Y'){
 
                             <?php if($_GET['min-width'] || $_GET['min-length']):?>
                                 <span class="chosen-option" id="house-sizeDropdown_span">
-                                    <?php if ($_GET['min-width']): ?> <?= $_GET['min-width'] ?> <?php endif; ?>
-                                    <?php if ($_GET['min-length']): ?> x <?= $_GET['min-length'] ?> <?php endif; ?> м
+                                    <?php if ($_GET['min-length']): ?> <?= $_GET['min-length'] ?> <?php endif; ?>
+                                	<?php if ($_GET['min-width']): ?> x <?= $_GET['min-width'] ?> <?php endif; ?> м
                                     <span class="my-cross my-cross--b-chosen-option house-sizeDropdown" data-parent="house-sizeDropdown"></span>
                                 </span>
                             <?php else:?>
